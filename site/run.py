@@ -1,4 +1,4 @@
-from chat_bot import app
+from src.chat_bot import app
 
 if __name__ == "__main__":
     app.run(port=5555)

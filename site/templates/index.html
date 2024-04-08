@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat Bot</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   </head>
   <body>
     <div class="chat-container">
@@ -15,6 +17,10 @@
         <button id="reset-button">Reset</button>
       </div>
     </div>
+    <!-- Ajoutez cette div pour afficher la carte -->
+    <div id="map" style="height: 400px;"></div>
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
   </body>
 </html>
