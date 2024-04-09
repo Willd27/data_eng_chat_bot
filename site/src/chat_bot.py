@@ -2,10 +2,20 @@ from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
+import folium as fm
+
 
 user_responses = {}
 
 countries_total = []
+
+
+df = pd.read_csv('src/table-indicateurs-open-data-dep-2023-06-30-17h59.csv')
+deps = pd.read_csv('src/deps.csv')
+df_mean = df.groupby('dep').mean().reset_index()
+df_mean.dep = df_mean.dep.apply(lambda x: f'{x:02}' if isinstance(x, int) else x)
+df_mean = df_mean.merge(deps, on='dep')
+
 
 app = Flask(__name__)
 
@@ -29,7 +39,7 @@ questions = {
 
 curr_question = 0
 
-data = pd.read_csv('./Cleaned-Data.csv')
+data = pd.read_csv('src/Cleaned-Data.csv')
 columns = ['Fever', 'Tiredness', 'Dry-Cough', 'Difficulty-in-Breathing', 'Sore-Throat', 'None_Sympton',
            'Pains', 'Nasal-Congestion', 'Runny-Nose', 'Diarrhea', 'None_Experiencing', 'Age_0-9', 'Age_10-19',
            'Age_20-24', 'Age_25-59', 'Age_60+', 'Gender_Female', 'Gender_Male', 'Gender_Transgender',
@@ -106,7 +116,6 @@ def get_question():
     if column == 'Fever':
         user_responses[column] = user_response
 
-    
 
     if curr_question < len(questions):
         question = list(questions.values())[curr_question]
@@ -132,6 +141,31 @@ def reset_chat_session():
     curr_question = 0  # Reset the current question index
     #user_responses = {}  # Reset answers array
     return jsonify({"message": "Chat session reset successfully."})
+
+
+@app.route("/render_map", methods=["GET"])
+def render_map():
+
+    m = fm.Map(location=[46.603354, 1.888334], zoom_start=6)
+
+    fm.Choropleth(
+        geo_data="src/departements.geojson",
+        name='choropleth',
+        data=df_mean,
+        columns=['dep', 'hosp'],
+        key_on='feature.properties.code',
+        fill_color='YlOrRd',
+        fill_opacity=0.7,
+        line_opacity=0.2,
+        legend_name='Hospitalisations',
+        highlight=True
+    ).add_to(m)
+
+    map_file_path = 'src/map.html'
+    m.save(map_file_path)
+
+    return render_template('index.html', map_file='map.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
