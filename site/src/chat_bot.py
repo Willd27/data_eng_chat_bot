@@ -101,6 +101,25 @@ def predict_severity(features):
 
 @app.route("/")
 def index():
+    m = fm.Map(location=[46.603354, 1.888334], zoom_start=6)
+
+    fm.Choropleth(
+        geo_data="src/departements.geojson",
+        name='choropleth',
+        data=df_mean,
+        columns=['dep', 'hosp'],
+        key_on='feature.properties.code',
+        fill_color='YlOrRd',
+        fill_opacity=0.7,
+        line_opacity=0.2,
+        legend_name='Hospitalisations',
+        highlight=True
+    ).add_to(m)
+
+    map_file_path = 'src/map.html'
+    m.save(map_file_path)
+
+    return render_template('index.html', map_file='map.html')
     return render_template("index.html")
 
 

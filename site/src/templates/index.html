@@ -9,19 +9,21 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   </head>
   <body>
-    <div class="chat-container">
+    <div class="chat-container" style="display: flex; justify-content: space-evenly;">
+
+      <div style="display: flex; flex-direction: column;">
       <div class="chat-box" id="chat-box">Welcome to COVID BOT</div>
       <input type="text" id="user-input" placeholder="Type your message..." />
+    </div>
       <div>
         <button id="send-button">Send</button>
         <button id="reset-button">Reset</button>
       </div>
-    </div>
     <!-- Ajoutez cette div pour afficher la carte -->
-    <div id="map" style="height: 400px;"></div>
-    <div id="map2">
-    <iframe src="src/map.html" width="10%" height="500"></iframe>
-    </div>
+    <div id="map" style="height: 00px;"></div>
+    <iframe src="{{ url_for('static', filename='map.html') }}" width="100%" height="500"></iframe>  
+  </div>
+
     <!-- Leaflet JavaScript -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
