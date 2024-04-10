@@ -4,14 +4,15 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 import folium as fm
 
+path = 'src/data/'
 
 user_responses = {}
 
 countries_total = []
 
 
-df = pd.read_csv('src/table-indicateurs-open-data-dep-2023-06-30-17h59.csv')
-deps = pd.read_csv('src/deps.csv')
+df = pd.read_csv(f'{path}table-indicateurs-open-data-dep-2023-06-30-17h59.csv')
+deps = pd.read_csv(f'{path}deps.csv')
 df_mean = df.groupby('dep').mean().reset_index()
 df_mean.dep = df_mean.dep.apply(lambda x: f'{x:02}' if isinstance(x, int) else x)
 df_mean = df_mean.merge(deps, on='dep')
@@ -39,7 +40,7 @@ questions = {
 
 curr_question = 0
 
-data = pd.read_csv('src/Cleaned-Data.csv')
+data = pd.read_csv(f'{path}Cleaned-Data.csv')
 columns = ['Fever', 'Tiredness', 'Dry-Cough', 'Difficulty-in-Breathing', 'Sore-Throat', 'None_Sympton',
            'Pains', 'Nasal-Congestion', 'Runny-Nose', 'Diarrhea', 'None_Experiencing', 'Age_0-9', 'Age_10-19',
            'Age_20-24', 'Age_25-59', 'Age_60+', 'Gender_Female', 'Gender_Male', 'Gender_Transgender',
@@ -104,7 +105,7 @@ def index():
     m = fm.Map(location=[46.603354, 1.888334], zoom_start=6)
 
     fm.Choropleth(
-        geo_data="src/departements.geojson",
+        geo_data=f'{path}departements.geojson',
         name='choropleth',
         data=df_mean,
         columns=['dep', 'hosp'],
@@ -164,11 +165,10 @@ def reset_chat_session():
 
 @app.route("/render_map", methods=["GET"])
 def render_map():
-
     m = fm.Map(location=[46.603354, 1.888334], zoom_start=6)
 
     fm.Choropleth(
-        geo_data="src/departements.geojson",
+        geo_data=f'{path}departements.geojson',
         name='choropleth',
         data=df_mean,
         columns=['dep', 'hosp'],
