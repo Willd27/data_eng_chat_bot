@@ -11,11 +11,8 @@ user_responses = {}
 countries_total = []
 
 
-df = pd.read_csv(f'{path}table-indicateurs-open-data-dep-2023-06-30-17h59.csv')
-deps = pd.read_csv(f'{path}deps.csv')
-df_mean = df.groupby('dep').mean().reset_index()
-df_mean.dep = df_mean.dep.apply(lambda x: f'{x:02}' if isinstance(x, int) else x)
-df_mean = df_mean.merge(deps, on='dep')
+#df = pd.read_csv(f'{path}table-indicateurs-open-data-dep-2023-06-30-17h59.csv')
+df = pd.read_csv(f'{path}deps_mean.csv')
 
 
 app = Flask(__name__)
@@ -30,7 +27,7 @@ questions = {
     'Runny-Nose': 'Do you have a Runny-Nose? [Yes, No]',
     'Nasal-Congestion': 'Do you have Nasal-Congestion? [Yes, No]',
     'Pains': 'Do you have Pains? [Yes, No]',
-    'None_Sympton': 'Do you have any symptoms? [Yes, No]',
+    'None_Sympton': 'Do you have zero symptoms? [Yes, No]',
     'Sore-Throat': 'Do you have a Sore-Throat? [Yes, No]',
     'Difficulty-in-Breathing': 'Do you have Difficulty-in-Breathing? [Yes, No]',
     'Dry-Cough': 'Do you have a Dry-Cough? [Yes, No]',
@@ -107,8 +104,8 @@ def index():
     fm.Choropleth(
         geo_data=f'{path}departements.geojson',
         name='choropleth',
-        data=df_mean,
-        columns=['dep', 'hosp'],
+        data=df,
+        columns=['dep', 'tx_incid'],
         key_on='feature.properties.code',
         fill_color='YlOrRd',
         fill_opacity=0.7,
@@ -117,11 +114,9 @@ def index():
         highlight=True
     ).add_to(m)
 
-    map_file_path = 'src/map.html'
-    m.save(map_file_path)
+    m.save('src/static/map.html')
 
     return render_template('index.html', map_file='map.html')
-    return render_template("index.html")
 
 
 @app.route("/get_question", methods=["POST"])
@@ -162,28 +157,6 @@ def reset_chat_session():
     #user_responses = {}  # Reset answers array
     return jsonify({"message": "Chat session reset successfully."})
 
-
-@app.route("/render_map", methods=["GET"])
-def render_map():
-    m = fm.Map(location=[46.603354, 1.888334], zoom_start=6)
-
-    fm.Choropleth(
-        geo_data=f'{path}departements.geojson',
-        name='choropleth',
-        data=df_mean,
-        columns=['dep', 'hosp'],
-        key_on='feature.properties.code',
-        fill_color='YlOrRd',
-        fill_opacity=0.7,
-        line_opacity=0.2,
-        legend_name='Hospitalisations',
-        highlight=True
-    ).add_to(m)
-
-    map_file_path = 'src/map.html'
-    m.save(map_file_path)
-
-    return render_template('index.html', map_file='map.html')
 
 
 if __name__ == "__main__":
